@@ -1,0 +1,33 @@
+version: '3.5'
+
+services:
+  mongo-data:
+    container_name: scone_mongo
+    image: mongo:4.4.4
+    ports:
+      - "127.0.0.1:27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - type: volume
+        source: mongo-data-db
+        target: /data/db
+
+  postgres:
+    container_name: scone_postgres
+    image: postgis/postgis:13-3.1-alpine
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+
+  scone-processor:
+    container_name: scone_processor
+    build: ./build/docker/
+    image: scone-processor:0.0.0
+    volumes:
+      - ./logs:/logs
+
+volumes:
+  mongo-data-db:
