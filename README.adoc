@@ -1,0 +1,53 @@
+= API Crawler
+
+image:https://github.com/cyface-de/crawler/workflows/Java%20CI/badge.svg[Build Status]
+
+This project contains a scheduler which executes the API crawler included in this project regularly.
+It's purpose is to read and persist the API result of different APIs for further analysis.
+
+Changes between versions are found in the link:https://github.com/cyface-de/crawler/releases[Release Section].
+
+The project uses link:https://gradle.org/[Gradle] as the build system.
+
+[#_deployment]
+== Deployment
+
+=== Using Docker
+
+- Change to the executable folder (e.g. `./executables/scone-crawler`)
+- Adjust the settings in `docker-compose.yml` like the API TOKEN
+- Execute `../../gradlew copyToDockerBuildFolder` to build the jar and arrange the docker files locally.
+- Execute `docker-compose build` to build a new Docker image locally with the most recent jar.
+- Execute `docker-compose up -d` to start the database(s) and executable.
+
+=== Using Command-Line
+
+Execute `./gradlew publishAllPublicationsToLocalRepository` to build the `jar` files locally.
+You can find them in `./build/repo/`.
+
+==== Crawler
+Execute `java -jar scone-crawler-{$VERSION}-all.jar -lt "LIME_API_TOKEN"`
+or without parameters to see the all, including the optional, parameters.
+
+==== Processor
+Execute `java -jar scone-processor-{$VERSION}-fat.jar`
+or with another random parameter to see the all, including the optional, parameters.
+
+[#_licensing]
+== Licensing
+Copyright 2021 Cyface GmbH
+
+This file is part of the Cyface Crawler.
+
+The Cyface Crawler is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The Cyface Crawler is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the Cyface Crawler. If not, see http://www.gnu.org/licenses/.

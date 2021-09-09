@@ -1,0 +1,173 @@
+import com.github.spotbugs.SpotBugsTask
+
+/*
+ * Copyright 2021 Cyface GmbH
+ *
+ * This file is part of the Cyface Crawler.
+ *
+ *  The Cyface Crawler is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The Cyface Crawler is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ */
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+  }
+}
+
+plugins {
+  id 'eclipse'
+  id 'idea'
+  //noinspection SpellCheckingInspection
+  id 'com.github.johnrengelman.shadow' version '6.1.0' apply false
+  id "com.github.spotbugs" version "3.0.0" apply false
+}
+
+wrapper {
+  gradleVersion = '6.3'
+}
+
+repositories {
+  mavenCentral()
+}
+
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+}
+
+subprojects {
+  apply plugin: 'maven-publish'
+  apply plugin: 'com.github.spotbugs'
+  apply plugin: 'jacoco'
+  apply plugin: 'checkstyle'
+  apply plugin: 'pmd'
+  apply plugin: 'java'
+
+  group = 'de.cyface'
+  version = '1.0.0'
+
+  tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+
+    checkstyle {
+      toolVersion = '8.31'
+      // use one common config file for all subprojects
+      configFile = project(':').file("config/checkstyle/checkstyle.xml")
+      //noinspection SpellCheckingInspection
+      configProperties = ["suppressionFile": project(':').file("config/checkstyle/suppressions.xml")]
+      ignoreFailures = true
+      showViolations = true
+    }
+  }
+
+  ext {
+    commonsLangVersion = '3.9'
+    commonsCliVersion = '1.4'
+    orgJsonVersion = '20200518'
+    httpClientVersion = '4.5.10'
+    slf4jVersion = '1.7.29'
+    jdbcPostgresDriverVersion = '42.2.6'
+    mongoDatabaseVersion = '4.2.2'
+
+    // Versions of testing dependencies
+    junitVersion = '5.6.1'
+    mockitoVersion = '3.3.3'
+    hamcrestVersion = '2.2'
+
+    jacocoVersion = '0.8.5'
+    spotBugsPluginVersion = '1.10.1'
+  }
+
+  // Code Quality Checker
+  dependencies {
+    // Testing Dependencies
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testImplementation "org.hamcrest:hamcrest:$hamcrestVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+
+    spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:$spotBugsPluginVersion"
+  }
+
+  test {
+    useJUnitPlatform()
+    testLogging {
+      events "passed", "skipped", "failed"
+    }
+  }
+
+  jacoco {
+    toolVersion = "$jacocoVersion"
+    reportsDir = file("$buildDir/reports/jacoco")
+  }
+
+  jacocoTestReport {
+    reports {
+      xml.enabled true
+      csv.enabled true
+      html.destination file("${buildDir}/reports/jacocoHtml")
+    }
+  }
+
+  spotbugs {
+    toolVersion = '4.0.2'
+    ignoreFailures = true
+    excludeFilter = file("$rootProject.projectDir/config/spotbugs/excludeFilter.xml")
+  }
+
+  tasks.withType(SpotBugsTask) {
+    reports {
+      xml.enabled = false
+      html.enabled = true
+    }
+    pluginClasspath = project.configurations.spotbugsPlugins
+  }
+
+  pmd {
+    toolVersion = '6.22.0'
+    //noinspection GroovyAssignabilityCheck
+    incrementalAnalysis = true
+    ruleSetFiles = project(':').files('config/pmd.xml')
+    rulePriority = 4
+    ruleSets = []
+    // There are so many violations and currently it is not really important in this application.
+    ignoreFailures = true
+  }
+
+  // Definitions for the maven-publish Plugin
+  publishing {
+    // The following repositories are used to publish artifacts to.
+    repositories {
+      maven {
+        name = 'github'
+        url = uri("https://maven.pkg.github.com/cyface-de/crawler")
+        credentials {
+          username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+          password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+        }
+      }
+      maven {
+        name = 'local'
+        url = "file://${rootProject.buildDir}/repo"
+      }
+    }
+  }
+}

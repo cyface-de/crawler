@@ -1,0 +1,33 @@
+# Eclipse Files
+**/.classpath
+**/.settings
+**/bin
+**/.project
+
+# Intellij Idea Files
+**/.idea
+**/.editorconfig
+**/out
+**/*.iml
+
+# Gradle Temporary Files
+**/.gradle/
+**/build
+**/local.properties
+**/gradle.properties
+
+# Ignore local test maven repositories
+**/repo
+
+# Vim Temporary Files
+**/*.swp
+
+# Cyface Temporary Files
+**/conf.json
+**/*.log
+**/secrets
+*.json
+*.csv
+
+# Temporary Git Files
+**/*.orig

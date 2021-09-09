@@ -1,0 +1,58 @@
+/*
+ * Copyright 2021 Cyface GmbH
+ *
+ * This file is part of the Cyface Crawler.
+ *
+ *  The Cyface Crawler is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The Cyface Crawler is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * The build gradle file for the crawler result processing application
+ *
+ * @author Armin Schnabel
+ * @version 1.0.0
+ */
+// Define the main class for the application
+mainClassName = 'de.cyface.crawler.processor.Application'
+
+dependencies {
+    implementation project(":libs:model")
+
+    // Utils
+    implementation "org.apache.commons:commons-lang3:$commonsLangVersion" // Validate utils
+    implementation "commons-cli:commons-cli:$commonsCliVersion" // Make program parameterizable
+
+    // Logging
+    implementation "org.slf4j:slf4j-simple:$slf4jVersion"
+
+    // Database Driver
+    implementation "org.postgresql:postgresql:$jdbcPostgresDriverVersion" // Postgres Database driver to write results
+    implementation "org.mongodb:mongodb-driver-sync:$mongoDatabaseVersion" // Access Mongo Database
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+/**
+ * This is only used in dev environment and avoids copying a JAR into `src`.
+ */
+task copyToDockerBuildFolder(type: Copy) {
+    dependsOn shadowJar
+    into './build/docker/'
+    from './src/main/docker/'
+    from shadowJar.outputs
+    rename 'scone-processor-(.*)-all.jar','scone-processor-all.jar'
+}
