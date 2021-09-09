@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   mongo-data:
-    container_name: scone_mongo
+    container_name: crawler_mongo
     #restart: always - only in production
     image: mongo:4.4.4
     ports:
@@ -15,11 +15,11 @@ services:
         source: mongo-data-db
         target: /data/db
 
-  scone-crawler:
-    container_name: scone_crawler
+  crawler-crawler:
+    container_name: crawler_crawler
     #restart: always - only in production
     build: ./build/docker/
-    image: scone-crawler:0.0.0
+    image: crawler:0.0.0
     volumes:
       - ./logs:/logs
     environment:

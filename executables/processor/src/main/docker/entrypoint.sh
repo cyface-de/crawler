@@ -18,7 +18,7 @@
 #
 # Version 1.0.0
 
-echo "Running Scone Processor"
+echo "Running Processor"
 
 echo "Waiting for Databases to start!"
 
@@ -63,5 +63,5 @@ if [ "$COUNTER" -ge 10 ]; then
 fi
 
 # PROCESSOR
-echo "Starting Scone Processor"
-java -jar scone-processor-all.jar &> /logs/scone-processor-out.log
+echo "Starting Processor"
+java -jar processor-all.jar &> /logs/processor-out.log

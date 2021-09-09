@@ -13,7 +13,7 @@
 include ':libs'
 include ':libs:model'
 include ':executables'
-include ':executables:scone-crawler'
-include ':executables:scone-processor'
+include ':executables:crawler'
+include ':executables:processor'
 
 rootProject.name = 'crawler'

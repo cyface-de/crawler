@@ -53,7 +53,7 @@ if [[ -n $NUMBER_OF_CRAWLERS ]]; then
 	NOC_PARAMETER=" -noc $NUMBER_OF_CRAWLERS "
 fi
 
-echo "Running Scone Crawler"
+echo "Running Crawler"
 
 echo "Waiting for Database to start!"
 
@@ -77,4 +77,4 @@ if [ "$COUNTER" -ge 10 ]; then
 fi
 
 echo "Starting Crawler"
-java -jar scone-crawler-all.jar -lt "$LIME_API_TOKEN" "$MBR_PARAMETER" "$MRH_PARAMETER" "$MRC_PARAMETER" "$CN_PARAMETER" "$NOC_PARAMETER" &> /logs/scone-crawler-out.log
+java -jar crawler-all.jar -lt "$LIME_API_TOKEN" "$MBR_PARAMETER" "$MRH_PARAMETER" "$MRC_PARAMETER" "$CN_PARAMETER" "$NOC_PARAMETER" &> /logs/crawler-out.log
