@@ -17,13 +17,13 @@
  *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * The build gradle file for the crawler result processing application
+ * The build gradle file for the API crawler application
  *
  * @author Armin Schnabel
  * @version 1.0.0
  */
 // Define the main class for the application
-mainClassName = 'de.cyface.crawler.processor.Application'
+mainClassName = 'de.cyface.crawler.Application'
 
 dependencies {
     implementation project(":libs:model")
@@ -36,8 +36,11 @@ dependencies {
     implementation "org.slf4j:slf4j-simple:$slf4jVersion"
 
     // Database Driver
-    implementation "org.postgresql:postgresql:$jdbcPostgresDriverVersion" // Postgres Database driver to write results
     implementation "org.mongodb:mongodb-driver-sync:$mongoDatabaseVersion" // Access Mongo Database
+
+    // Requests
+    implementation "org.apache.httpcomponents:httpclient:${httpClientVersion}" // For sending queries
+    implementation "org.json:json:$orgJsonVersion"
 }
 
 shadowJar {
@@ -54,5 +57,5 @@ task copyToDockerBuildFolder(type: Copy) {
     into './build/docker/'
     from './src/main/docker/'
     from shadowJar.outputs
-    rename 'scone-processor-(.*)-all.jar','scone-processor-all.jar'
+    rename 'crawler-(.*)-all.jar','crawler-all.jar'
 }

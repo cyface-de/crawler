@@ -24,7 +24,7 @@ MAINTAINER Cyface GmbH <mail@cyface.de>
 # Set the working directory to /app
 WORKDIR /app
 
-COPY scone-crawler-all.jar /app
+COPY crawler-all.jar /app
 COPY entrypoint.sh /app
 RUN chmod +x /app/entrypoint.sh
 

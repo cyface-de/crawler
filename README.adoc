@@ -1,6 +1,6 @@
 = API Crawler
 
-image:https://github.com/cyface-de/crawler/workflows/Java%20CI/badge.svg[Build Status]
+image:https://github.com/cyface-de/crawler/actions/workflows/build.yml/badge.svg[Build Status]
 
 This project contains a scheduler which executes the API crawler included in this project regularly.
 It's purpose is to read and persist the API result of different APIs for further analysis.
@@ -14,7 +14,7 @@ The project uses link:https://gradle.org/[Gradle] as the build system.
 
 === Using Docker
 
-- Change to the executable folder (e.g. `./executables/scone-crawler`)
+- Change to the executable folder (e.g. `./executables/crawler`)
 - Adjust the settings in `docker-compose.yml` like the API TOKEN
 - Execute `../../gradlew copyToDockerBuildFolder` to build the jar and arrange the docker files locally.
 - Execute `docker-compose build` to build a new Docker image locally with the most recent jar.
@@ -26,11 +26,11 @@ Execute `./gradlew publishAllPublicationsToLocalRepository` to build the `jar` f
 You can find them in `./build/repo/`.
 
 ==== Crawler
-Execute `java -jar scone-crawler-{$VERSION}-all.jar -lt "LIME_API_TOKEN"`
+Execute `java -jar crawler-{$VERSION}-all.jar -lt "LIME_API_TOKEN"`
 or without parameters to see the all, including the optional, parameters.
 
 ==== Processor
-Execute `java -jar scone-processor-{$VERSION}-fat.jar`
+Execute `java -jar processor-{$VERSION}-fat.jar`
 or with another random parameter to see the all, including the optional, parameters.
 
 [#_licensing]
