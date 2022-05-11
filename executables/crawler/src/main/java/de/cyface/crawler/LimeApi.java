@@ -3,18 +3,18 @@
  *
  * This file is part of the Cyface Crawler.
  *
- *  The Cyface Crawler is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * The Cyface Crawler is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  The Cyface Crawler is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * The Cyface Crawler is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with the Cyface Crawler. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cyface.crawler;
 
@@ -64,11 +64,29 @@ public class LimeApi {
      */
     private final HttpClient httpClient;
 
-    public LimeApi(HttpClient httpClient, String limeAuthToken) {
+    /**
+     * Constructs a fully initialized instance of this class.
+     *
+     * @param httpClient Client used to send HTTP requests to a server running a Lime API.
+     * @param limeAuthToken This token has to be manually requested via REST and SMS. It's user-dependent.
+     */
+    public LimeApi(final HttpClient httpClient, final String limeAuthToken) {
         this.httpClient = httpClient;
         this.authToken = limeAuthToken;
     }
 
+    /**
+     * Queries the API for vehicle locations in a specific bounding box.
+     *
+     * @param bb The bounding box to search vehicles for.
+     * @param regionCount The number of regions in the queue for subsequent API requests.
+     * @param vehicleCount The number of vehicles found so far.
+     * @param requestCounter The number of requests sent so far.
+     * @param requestTime The time when this request was initiated.
+     * @return The `bikes` part of the response from the API request.
+     * @throws ApiUnavailable If the API is not available.
+     * @throws JSONException If the program failed to write to the log file.
+     */
     public JSONArray vehicles(final BoundingBox bb, final int regionCount, final int vehicleCount,
             Integer[] requestCounter, final Date requestTime) throws ApiUnavailable, JSONException {
 
@@ -81,6 +99,16 @@ public class LimeApi {
         return attributes.getJSONArray("bikes");
     }
 
+    /**
+     * Creates the query for the API request.
+     *
+     * @param requestTime The time when this request was initiated.
+     * @param requestCounter The number of requests sent so far.
+     * @param vehicleCount The number of vehicles found so far.
+     * @param bb The bounding box to search vehicles for.
+     * @param regionCount The number of regions in the queue for subsequent API requests.
+     * @return The query parameters starting with `?`
+     */
     private String query(Date requestTime, Integer[] requestCounter, final int vehicleCount, BoundingBox bb,
             final int regionCount) {
         LOGGER.info(requestTime.toString() + " request " + requestCounter[0] + ": "
@@ -94,6 +122,13 @@ public class LimeApi {
                 bb.getCenterLat(), bb.getCenterLon(), bb.getZoom());
     }
 
+    /**
+     * Sends the API requests.
+     *
+     * @param query the query to send.
+     * @return The `data.attributes` part of the API response.
+     * @throws ApiUnavailable If the API is not available.
+     */
     private JSONObject sendRequest(final String query) throws ApiUnavailable {
         try {
             final var request = HttpRequest.newBuilder(URI.create(URI_STRING + query))

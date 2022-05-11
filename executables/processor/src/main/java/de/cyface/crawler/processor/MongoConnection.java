@@ -3,18 +3,18 @@
  *
  * This file is part of the Cyface Crawler.
  *
- *  The Cyface Crawler is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * The Cyface Crawler is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  The Cyface Crawler is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * The Cyface Crawler is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with the Cyface Crawler. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cyface.crawler.processor;
 
@@ -87,6 +87,13 @@ public final class MongoConnection {
         this.password = password;
     }
 
+    /**
+     * Loads the location {@link Record}s from the database.
+     *
+     * @param collectionName The collection name of the database to load the data from
+     * @return A {@link Map} which contains the "last three" of the plate number identifying a vehicle as key and the
+     *         records of that vehicle as value
+     */
     public Map<String, List<Record>> records(final String collectionName) {
 
         final String connectionString = String.format("mongodb://%s:%s@%s:%s", username, password, host, port);
@@ -100,7 +107,6 @@ public final class MongoConnection {
             // 'Sort exceeded memory limit of 104857600 bytes, but did not opt in to external sorting.'
             final var res = collection.find().sort(sort).allowDiskUse(true);
 
-            // TODO: Inefficient code
             final var ret = new HashMap<String, List<Record>>();
             res.forEach(d -> {
                 final var lastThree = d.getString("last_three");

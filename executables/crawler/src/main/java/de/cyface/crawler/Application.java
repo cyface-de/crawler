@@ -133,6 +133,15 @@ public class Application {
      */
     private final MongoConnection mongoConnection;
 
+    /**
+     *
+     * @param mongoHost
+     * @param mongoPort
+     * @param mongoDatabase
+     * @param mongoCollection
+     * @param mongoUser
+     * @param mongoPassword
+     */
     public Application(String mongoHost, String mongoPort, String mongoDatabase, String mongoCollection,
             String mongoUser, String mongoPassword) {
         this.mongoConnection = new MongoConnection(mongoHost, Integer.parseInt(mongoPort), mongoDatabase, mongoUser,
@@ -248,7 +257,8 @@ public class Application {
     }
 
     /**
-     * To support multiple Crawler instances this method helps each one can starts at a different time frame.
+     * To support multiple Crawler instances this method allows each instance to start at a different time frame.
+     * <p>
      * For this we use the numberOfCrawlers and this crawler's crawlerNumber, e.g.:
      * - secondsBetweenCrawls = 2 hours
      * - crawlerNumber 1 of 8: starts at next 0:00, 2:00, 4:00, ..., 22:00 time spot

@@ -3,18 +3,18 @@
  *
  * This file is part of the Cyface Crawler.
  *
- *  The Cyface Crawler is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * The Cyface Crawler is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  The Cyface Crawler is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * The Cyface Crawler is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with the Cyface Crawler. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cyface.crawler.processor;
 
@@ -70,12 +70,30 @@ public class Application {
     static final String POSTGRES_PASSWORD_LONG_OPTION = "postgres-password";
     static final String DEBUG_MODE_SHORT_OPTION = "dm";
     static final String DEBUG_MODE_LONG_OPTION = "debug-mode";
-
+    /**
+     * Database to persist crawled data into.
+     */
     private final MongoConnection dataSource;
+    /**
+     * Database to persist extracted source-destination relations into.
+     */
     private final PostgresConnection dataLake;
 
-    public Application(String mongoHost, String mongoPort, String mongoDatabase, String mongoUser, String mongoPassword,
-            String postgresUrl, String postgresUser, String postgresPassword) {
+    /**
+     * Constructs a fully initialized instance of this class.
+     *
+     * @param mongoHost The hostname of the mongo db to write to
+     * @param mongoPort The port of the mongo db to write to
+     * @param mongoDatabase The database to write to
+     * @param mongoUser The username to authenticate to the mongo db
+     * @param mongoPassword The password to authenticate to the mongo db
+     * @param postgresUrl The postgres URL to write extracted relations into
+     * @param postgresUser The username to authenticate to the postgres db
+     * @param postgresPassword The password to authenticate to the postgres db
+     */
+    public Application(final String mongoHost, final String mongoPort, final String mongoDatabase,
+            final String mongoUser, final String mongoPassword, final String postgresUrl, final String postgresUser,
+            final String postgresPassword) {
         this.dataSource = new MongoConnection(mongoHost, Integer.parseInt(mongoPort), mongoDatabase, mongoUser,
                 mongoPassword);
         this.dataLake = new PostgresConnection(postgresUrl, postgresUser, postgresPassword);
@@ -128,7 +146,7 @@ public class Application {
      * @param postgresTable name of the table to write the processing result to
      * @param debugMode {@code true} to log processing results into CSV files
      */
-    public void run(final String mongoCollection, String postgresTable, boolean debugMode) {
+    public void run(final String mongoCollection, final String postgresTable, final boolean debugMode) {
         final var res = new Processor(dataSource).run(mongoCollection);
         final var relations = new ArrayList<SourceDestinationRelation>();
         res.values().forEach(relations::addAll);
@@ -145,7 +163,13 @@ public class Application {
         }
     }
 
-    private void dumpToFile(ArrayList<SourceDestinationRelation> relations) throws IOException {
+    /**
+     * Writes the current state of the processor into a file for debugging.
+     *
+     * @param relations The relations found so far.
+     * @throws IOException If the file could not be written to.
+     */
+    private void dumpToFile(final ArrayList<SourceDestinationRelation> relations) throws IOException {
         // Dump into file for fast debugging
         final var requestsFile = Paths.get(new Date().getTime() + "_results.csv");
         Files.writeString(requestsFile,
