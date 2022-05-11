@@ -3,18 +3,18 @@
  *
  * This file is part of the Cyface Crawler.
  *
- *  The Cyface Crawler is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * The Cyface Crawler is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  The Cyface Crawler is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * The Cyface Crawler is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with the Cyface Crawler. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cyface.crawler.processor;
 
@@ -112,7 +112,7 @@ public class Processor {
 
                 /*
                  * We don't remove "maintenance drives"
-                 * - this is done in post-processing (VÖ) as the "drives" are routed and with that things like
+                 * - this is done in post-processing (TUD) as the "drives" are routed and with that things like
                  * disposition, battery range vs. traveled range discrepancies etc. can be identified better
                  *
                  * final var recharged = withoutCrawlingGaps.stream().filter(p -> p.destination.getBatteryPercentage()
@@ -156,7 +156,7 @@ public class Processor {
      * @param plateRecords the ordered list of records of each vehicle ("lastThree" of the plate)
      * @return the pairs of each vehicle
      */
-    private Map<String, List<SourceDestinationRelation>> pair(Map<String, List<Record>> plateRecords) {
+    private Map<String, List<SourceDestinationRelation>> pair(final Map<String, List<Record>> plateRecords) {
         final var ret = new HashMap<String, List<SourceDestinationRelation>>();
         plateRecords.keySet().forEach(plate -> {
             final var records = plateRecords.get(plate);
@@ -179,7 +179,7 @@ public class Processor {
      *
      * @return the estimated distance between both locations in kilometers
      */
-    private double distanceKm(double lat1, double lon1, double lat2, double lon2) {
+    private double distanceKm(final double lat1, final double lon1, final double lat2, final double lon2) {
         final int earthRadiusKm = 6371;
         final double latitudeDifferenceRad = degreeToRad(lat2 - lat1);
         final double longitudeDifferenceRad = degreeToRad(lon2 - lon1);

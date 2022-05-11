@@ -3,18 +3,18 @@
  *
  * This file is part of the Cyface Crawler.
  *
- *  The Cyface Crawler is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * The Cyface Crawler is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  The Cyface Crawler is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * The Cyface Crawler is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with the Cyface Crawler. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cyface.crawler;
 
@@ -47,6 +47,13 @@ import org.slf4j.LoggerFactory;
 import de.cyface.crawler.model.BoundingBox;
 import de.cyface.crawler.model.LimeVehicle;
 
+/**
+ * A crawler implementation for the e-scooter provider Lime.
+ *
+ * @author Armin Schnabel
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 public class LimeCrawler implements Crawler {
 
     /**
@@ -112,7 +119,17 @@ public class LimeCrawler implements Crawler {
         }
     }
 
-    private void scheduleCrawling(BoundingBox initialRegion, MongoConnection mongoWriter) throws IOException {
+    /**
+     * Starts crawling all vehicles in the defined region. Multiple requests will be sent until no more scooters are
+     * found or until the request limits defined in the constructor are reached.
+     *
+     * @param initialRegion The region to scan for vehicles
+     * @param mongoWriter The sink to write the vehicle locations into
+     * @throws IOException When the program failed to write to the log file
+     */
+    private void scheduleCrawling(final BoundingBox initialRegion, final MongoConnection mongoWriter)
+            throws IOException {
+
         final Date crawlStarted = new Date();
         final var plates = new HashSet<String>();
         final var vehicles = new HashSet<LimeVehicle>();
@@ -135,7 +152,7 @@ public class LimeCrawler implements Crawler {
                 () -> {
                     try {
 
-                        // Stop requests is limit is reached or queue is empty
+                        // Stop requests when limit is reached or queue is empty
                         if (errorReceived[0] || regions.isEmpty() || requestCounter[0] >= maxRequestsPerCrawl) {
                             futureReference.get().cancel(false); // Or else the persisting could be canceled?
 
@@ -184,8 +201,20 @@ public class LimeCrawler implements Crawler {
         futureReference.set(exec);
     }
 
-    private void log(Integer[] requestCounter, Date requestTime, BoundingBox bb, int newFound,
-            LinkedList<BoundingBox> regions, Path requestsFile) throws IOException {
+    /**
+     * Write statistics into a log file for monitoring or debugging purposes.
+     *
+     * @param requestCounter The number of the request sent.
+     * @param requestTime The time when the request was sent.
+     * @param bb The bounding box which was requested at the API.
+     * @param newFound The number of new vehicles found in the request.
+     * @param regions The regions still in the queue for subsequent requests.
+     * @param requestsFile The file to write the log to.
+     * @throws IOException When the program failed to write to the log file.
+     */
+    private void log(final Integer[] requestCounter, final Date requestTime, final BoundingBox bb, final int newFound,
+            final LinkedList<BoundingBox> regions, final Path requestsFile) throws IOException {
+
         if (debugMode) {
             final var builder = requestCounter[0] + "," + requestTime.getTime() +
                     "," + bb.getCenterLat() + "," + bb.getCenterLon() + "," + newFound +
@@ -194,7 +223,15 @@ public class LimeCrawler implements Crawler {
         }
     }
 
-    private Set<String> plates(JSONArray bikes) {
+    /**
+     * Extracts the plates of the vehicles found from the `bikes` part of the API response.
+     *
+     * @param bikes The `bikes` part of the API response.
+     * @return The extracted plates {@code String}, together with the coordinates, to catch vehicles with identical
+     *         "last three" plate numbers but different locations
+     */
+    private Set<String> plates(final JSONArray bikes) {
+
         return bikes.toList().stream().map(b -> {
             final var bike = ((HashMap<?, ?>)b);
             final var bikeAttributes = (HashMap<?, ?>)bike.get("attributes");
@@ -212,14 +249,26 @@ public class LimeCrawler implements Crawler {
      * @param crawlStarted the time at which the crawler was stated
      * @return the parsed data as POJOs
      */
-    private Set<LimeVehicle> vehicles(JSONArray bikes, Date requestTime, Date crawlStarted) {
+    private Set<LimeVehicle> vehicles(final JSONArray bikes, final Date requestTime, final Date crawlStarted) {
+
         final var ret = new HashSet<LimeVehicle>();
         bikes.forEach(v -> ret.add(new LimeVehicle((JSONObject)v, requestTime, crawlStarted)));
         return ret;
     }
 
-    List<BoundingBox> subRegions(BoundingBox bb, int newFound, @SuppressWarnings("SameParameterValue") int rows,
-            @SuppressWarnings("SameParameterValue") int cols) {
+    /**
+     * Slices a bounding box into a specific number of equal sized parts.
+     *
+     * @param bb The bounding box of the previous request to be sliced.
+     * @param newFound The number of new vehicles found in the previous request (which is the reason why the previous
+     *            region is sliced).
+     * @param rows The number of rows to slice the region into
+     * @param cols The number of columns to slice the region into
+     * @return The subregions
+     */
+    List<BoundingBox> subRegions(final BoundingBox bb, final int newFound,
+            @SuppressWarnings("SameParameterValue") final int rows,
+            @SuppressWarnings("SameParameterValue") final int cols) {
 
         final var latDiff = bb.getNorthEastLat() - bb.getSouthWestLat();
         final var lonDiff = bb.getNorthEastLon() - bb.getSouthWestLon();
@@ -240,8 +289,17 @@ public class LimeCrawler implements Crawler {
         return res;
     }
 
-    private void dumpToFile(Set<String> knownPlates, Set<LimeVehicle> knownVehicles, Date crawlStarted)
-            throws IOException {
+    /**
+     * Writes the current state of the crawl into a file for debugging.
+     *
+     * @param knownPlates The vehicle plates found so far.
+     * @param knownVehicles The vehicles found so far.
+     * @param crawlStarted The time when the crawl started.
+     * @throws IOException If the file could not be written to.
+     */
+    private void dumpToFile(final Set<String> knownPlates, final Set<LimeVehicle> knownVehicles,
+            final Date crawlStarted) throws IOException {
+
         final var platesFile = Paths.get(crawlStarted.getTime() + "_plates.csv");
         Files.createFile(platesFile);
         final var vehiclesFile = Paths.get(crawlStarted.getTime() + "_vehicles.csv");

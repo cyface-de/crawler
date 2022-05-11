@@ -3,18 +3,18 @@
  *
  * This file is part of the Cyface Crawler.
  *
- *  The Cyface Crawler is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * The Cyface Crawler is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  The Cyface Crawler is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * The Cyface Crawler is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with the Cyface Crawler.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with the Cyface Crawler. If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cyface.crawler.processor;
 
@@ -71,7 +71,14 @@ public final class PostgresConnection {
         this.password = password;
     }
 
-    public void write(ArrayList<SourceDestinationRelation> relations, String tableName) throws SQLException {
+    /**
+     * Persist a list of vehicle records.
+     *
+     * @param relations the data to persist
+     * @param tableName to write the data to
+     */
+    public void write(final ArrayList<SourceDestinationRelation> relations, final String tableName)
+            throws SQLException {
 
         final var props = new Properties();
         props.setProperty("user", username);
@@ -116,8 +123,8 @@ public final class PostgresConnection {
                     statement.setTimestamp(6, new Timestamp(relation.source.getRequestTime().getTime()));
                     statement.setTimestamp(7, new Timestamp(relation.destination.getRequestTime().getTime()));
                     statement.setString(8, relation.source.getPlateNumber());
-                    statement.setShort(9, (short) relation.source.getBatteryPercentage());
-                    statement.setShort(10, (short) relation.destination.getBatteryPercentage());
+                    statement.setShort(9, (short)relation.source.getBatteryPercentage());
+                    statement.setShort(10, (short)relation.destination.getBatteryPercentage());
                     statement.setInt(11, relation.source.getMeterRange());
                     statement.setInt(12, relation.destination.getMeterRange());
                     statement.setString(13, relation.source.getId().toString());
@@ -126,7 +133,7 @@ public final class PostgresConnection {
                     statement.addBatch();
                     count.getAndIncrement();
 
-                    // execute every 100 rows or less
+                    // execute every 100 rows or fewer
                     if (count.get() % 100 == 0 || count.get() == relations.size()) {
                         final var affectedRows = statement.executeBatch();
                         final var expected = (count.get() - inserted.get());
